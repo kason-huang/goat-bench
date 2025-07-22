@@ -5,6 +5,8 @@ __pycache__/
 # environment
 variables.sh
 habitat-lab
+eai-vc
+episode_metrics.json
 
 # development
 .idea
@@ -12,6 +14,7 @@ habitat-lab
 
 # data
 data
+result
 
 # logs
 tb/

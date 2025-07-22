@@ -42,7 +42,8 @@ habitat_baselines:
   rl:
 
     policy:
-      name: "GoatHighLevelPolicy"
+      #name: "GoatHighLevelPolicy"
+      name: "GOATPolicy"
 
     ppo:
       # ppo params

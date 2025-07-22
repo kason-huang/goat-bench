@@ -192,6 +192,7 @@ class GoatPPOTrainer(PPOTrainer):
             current_episodes_info = self.envs.current_episodes()
 
             with inference_mode():
+                # 这里是关键的模型推理，推理出action
                 (
                     _,
                     actions,
@@ -350,16 +351,16 @@ class GoatPPOTrainer(PPOTrainer):
                     episode_state_copy["episode_id"] = current_episodes_info[
                         i
                     ].episode_id
-                    episode_state_copy["subtasks"] = current_episodes_info[
-                        i
-                    ].tasks
+                    # episode_state_copy["subtasks"] = current_episodes_info[
+                    #     i
+                    # ].tasks
                     episode_state_copy["success_by_subtask"] = infos[i][
                         "success.subtask_success"
                     ]
                     episode_state_copy["spl_by_subtaskl"] = infos[i][
                         "spl.spl_by_subtask"
                     ]
-                    print("episode_state_copy", current_episodes_info[i].tasks)
+                    # print("episode_state_copy", current_episodes_info[i].tasks)
                     episode_state_copy["actions"] = saved_actions[i]
                     episode_metrics.append(episode_state_copy)
 

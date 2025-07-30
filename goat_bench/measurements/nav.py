@@ -313,6 +313,8 @@ class GoatSuccess(Measure):
             "partial_success": sum(self._success_by_subtasks.values())
             / sum(self._subtask_counts.values()),
             "subtask_success": self._subtask_success,
+            "num_subtask_success": sum(self._subtask_success),
+            "total_tasks": len(episode.tasks),
             **success_by_subtask,
         }
 

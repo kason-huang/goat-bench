@@ -388,6 +388,14 @@ class GoatPPOTrainer(PPOTrainer):
                             current_episodes_info[i].episode_id,
                         )
 
+                    # for k, v in stats_episodes.items():
+                    #     logger.info(f"###### kason ##### stats_episode {k}:")
+                    #     for sub_k, sub_v in v.items():
+                    #         if isinstance(sub_v, (float)):
+                    #             logger.info(f"    {sub_k}: {sub_v:.4f}")
+                    #         else:
+                    #             logger.info(f"    {sub_k}: {sub_v}")
+
             not_done_masks = not_done_masks.to(device=self.device)
             (
                 self.envs,
@@ -413,11 +421,34 @@ class GoatPPOTrainer(PPOTrainer):
             len(ep_eval_count) >= number_of_eval_episodes
         ), f"Expected {number_of_eval_episodes} episodes, got {len(ep_eval_count)}."
 
+        # ---------------- update kason ----------------
         aggregated_stats = {}
+        # for stat_key in next(iter(stats_episodes.values())).keys():
+        #     aggregated_stats[stat_key] = np.mean(
+        #         [v[stat_key] for v in stats_episodes.values() if stat_key in v]
+        #     )
+
+        # 特殊处理：先初始化这两个字段的总和为 0
+        aggregated_stats["success.num_subtask_success"] = 0
+        aggregated_stats["success.total_tasks"] = 0
+
+        # 遍历所有 episode 的统计信息
+        for v in stats_episodes.values():
+            if "success.num_subtask_success" in v:
+                aggregated_stats["success.num_subtask_success"] += v["success.num_subtask_success"]
+            if "success.total_tasks" in v:
+                aggregated_stats["success.total_tasks"] += v["success.total_tasks"]
+
+        # 处理其它的统计项（做平均）
         for stat_key in next(iter(stats_episodes.values())).keys():
-            aggregated_stats[stat_key] = np.mean(
-                [v[stat_key] for v in stats_episodes.values() if stat_key in v]
-            )
+            if stat_key in ["success.num_subtask_success", "success.total_tasks"]:
+                continue  # 已经特殊处理过了，跳过
+            values = [v[stat_key] for v in stats_episodes.values() if stat_key in v]
+            if values:  # 防止空列表
+                aggregated_stats[stat_key] = np.mean(values)
+
+        # ---------------- update kason ----------------
+
 
         for k, v in aggregated_stats.items():
             logger.info(f"Average episode {k}: {v:.4f}")

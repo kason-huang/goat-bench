@@ -131,8 +131,11 @@ class GoatDatasetV1(PointNavDatasetV1):
         if len(deserialized["episodes"]) == 0:
             return
 
+
         if "goals" not in deserialized:
             deserialized = self.dedup_goals(deserialized)
+
+
 
         self.goals = deserialized["goals"]
         num_filtered_eps = 0
@@ -217,5 +220,5 @@ class GoatDatasetV1(PointNavDatasetV1):
                         if x["object_id"] == goal_inst_id
                     ]
                     composite_episode.goals.append(goal_inst)
-
+                
             self.episodes.append(composite_episode)  # type: ignore [attr-defined]

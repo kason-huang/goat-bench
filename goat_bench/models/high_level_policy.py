@@ -104,7 +104,8 @@ class GoatHighLevelPolicyNet(Net):
         print("Start initialization of GOAT high level policy.......")
 
         ovon_policy_cls = baseline_registry.get_policy(
-            "PointNavResnetCLIPPolicy"
+            #"PointNavResnetCLIPPolicy"
+            "GOATPolicy"
         )
         print(observation_space)
         print(dir(observation_space))
@@ -125,12 +126,12 @@ class GoatHighLevelPolicyNet(Net):
             ovon_obs_space,
             low_level_policy_action_space,
         )
-        missing_keys = self.ovon_policy.load_state_dict(
-            self.load_ckpt(
-                "data/new_checkpoints/ovon/ver/resnetclip_rgb_text/seed_1/ckpt.121.pth"
-            )
-        )
-        print("OVON missing keys: {}\n\n".format(missing_keys))
+        # missing_keys = self.ovon_policy.load_state_dict(
+        #     self.load_ckpt(
+        #         "data/new_checkpoints/ovon/ver/resnetclip_rgb_text/seed_1/ckpt.121.pth"
+        #     )
+        # )
+        # print("OVON missing keys: {}\n\n".format(missing_keys))
 
         lnav_obs_space = spaces.Dict(
             {
@@ -144,7 +145,8 @@ class GoatHighLevelPolicyNet(Net):
             }
         )
         language_policy_cls = baseline_registry.get_policy(
-            "PointNavResnetCLIPPolicy"
+            #"PointNavResnetCLIPPolicy"
+            "GOATPolicy"
         )
         print("Pol ", language_policy_cls)
         self.language_policy = language_policy_cls.from_config(
@@ -152,12 +154,12 @@ class GoatHighLevelPolicyNet(Net):
             lnav_obs_space,
             low_level_policy_action_space,
         )
-        missing_keys = self.language_policy.load_state_dict(
-            self.load_ckpt(
-                "data/new_checkpoints/languagenav/ver/resnetclip_rgb_bert_text/seed_3/ckpt.18.pth"
-            )
-        )
-        print("Language nav missing keys: {}\n\n".format(missing_keys))
+        # missing_keys = self.language_policy.load_state_dict(
+        #     self.load_ckpt(
+        #         "data/new_checkpoints/languagenav/ver/resnetclip_rgb_bert_text/seed_3/ckpt.18.pth"
+        #     )
+        # )
+        # print("Language nav missing keys: {}\n\n".format(missing_keys))
 
         iinav_obs_space = spaces.Dict(
             {
@@ -171,19 +173,20 @@ class GoatHighLevelPolicyNet(Net):
             }
         )
         image_policy_cls = baseline_registry.get_policy(
-            "PointNavResnetCLIPPolicy"
+            #"PointNavResnetCLIPPolicy"
+            "GOATPolicy"
         )
         self.image_policy = image_policy_cls.from_config(
             config,
             iinav_obs_space,
             low_level_policy_action_space,
         )
-        missing_keys = self.image_policy.load_state_dict(
-            self.load_ckpt(
-                "data/new_checkpoints/iin/ver/resnetclip_rgb_vc1_image/seed_1/ckpt.70.pth"
-            )
-        )
-        print("IIN missing keys: {}".format(missing_keys))
+        # missing_keys = self.image_policy.load_state_dict(
+        #     self.load_ckpt(
+        #         "data/new_checkpoints/iin/ver/resnetclip_rgb_vc1_image/seed_1/ckpt.70.pth"
+        #     )
+        # )
+        # print("IIN missing keys: {}".format(missing_keys))
         print("Initialization of GOAT high level policy done.......")
 
         self.train()
@@ -243,6 +246,7 @@ class GoatHighLevelPolicyNet(Net):
                 rnn_hidden_states,
                 prev_actions,
                 masks,
+                rnn_build_seq_info
             )
             if action[0].item() == HabitatSimActions.stop:
                 action[0] = 6
@@ -271,6 +275,7 @@ class GoatHighLevelPolicyNet(Net):
                 rnn_hidden_states,
                 prev_actions,
                 masks,
+                rnn_build_seq_info
             )
             if action[0].item() == HabitatSimActions.stop:
                 action[0] = 6
@@ -299,6 +304,7 @@ class GoatHighLevelPolicyNet(Net):
                 rnn_hidden_states,
                 prev_actions,
                 masks,
+                rnn_build_seq_info
             )
             if action[0].item() == HabitatSimActions.stop:
                 action[0] = 6

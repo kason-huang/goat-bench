@@ -23,10 +23,13 @@ habitat:
 habitat_baselines:
   torch_gpu_id: 0
   tensorboard_dir: "tb"
+  writer_type: "tb"
   video_dir: "video_dir"
   test_episode_count: -1
   eval_ckpt_path_dir: "data/new_checkpoints"
-  num_environments: 32
+  #num_environments: 32
+  num_environments: 1 
+  num_processes: 1
   checkpoint_folder: "data/new_checkpoints"
   trainer_name: "ver"
   num_updates: 270000

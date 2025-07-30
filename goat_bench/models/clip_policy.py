@@ -156,6 +156,33 @@ class GOATPolicy(NetPolicy):
     def unfreeze_actor(self):
         for param in self.action_distribution.parameters():
             param.requires_grad_(True)
+    
+    # def act(
+    #     self,
+    #     observations,
+    #     rnn_hidden_states,
+    #     prev_actions,
+    #     masks,
+    #     rnn_build_seq_info=None,
+    #     deterministic=False,
+    # ):
+    #     features, rnn_hidden_states, _ = self.net(
+    #         observations, rnn_hidden_states, prev_actions, masks, rnn_build_seq_info
+    #     )
+    #     distribution = self.action_distribution(features)
+    #     value = self.critic(features)
+
+    #     if deterministic:
+    #         if self.action_distribution_type == "categorical":
+    #             action = distribution.mode()
+    #         elif self.action_distribution_type == "gaussian":
+    #             action = distribution.mean
+    #     else:
+    #         action = distribution.sample()
+
+    #     action_log_probs = distribution.log_probs(action)
+
+    #     return value, action, action_log_probs, rnn_hidden_states
 
 
 class PointNavResNetCLIPNet(Net):
@@ -393,24 +420,32 @@ class PointNavResNetCLIPNet(Net):
         masks,
         rnn_build_seq_info: Optional[Dict[str, torch.Tensor]] = None,
     ) -> Tuple[torch.Tensor, torch.Tensor, Dict[str, torch.Tensor]]:
+        # import pdb
         x = []
         aux_loss_state = {}
         clip_image_goal = None
         object_goal = None
+        # pdb.set_trace()
         if not self.is_blind:
             # We CANNOT use observations.get() here because
             # self.visual_encoder(observations) is an expensive operation. Therefore,
             # we need `# noqa: SIM401`
+            
+            #eval的时候 observation的keys是 ['compass', 'current_subtask', 'goat_subtask_goal', 'gps', 'rgb']
+            #train的时候 observation 的dict_keys(['compass', 'current_subtask', 'goat_subtask_goal', 'gps', 'rgb', 'visual_features'])
             if (  # noqa: SIM401
-                PointNavResNetNet.PRETRAINED_VISUAL_FEATURES_KEY in observations
+                PointNavResNetNet.PRETRAINED_VISUAL_FEATURES_KEY in observations 
             ):
                 visual_feats = observations[
                     PointNavResNetNet.PRETRAINED_VISUAL_FEATURES_KEY
-                ]
+                ] 
             else:
-                visual_feats = self.visual_encoder(observations)
-
-            if ClipImageGoalSensor.cls_uuid in observations:
+                # eval # 这个的模型是ResNetCLIPEncoder # [1, 2048]
+                # train 这个visual_feats是 [2, 2048]
+                visual_feats = self.visual_encoder(observations) 
+            
+            # cls_uuid class uuid: clip_imagegoal
+            if ClipImageGoalSensor.cls_uuid in observations: 
                 clip_image_goal = visual_feats[:, :1024]
                 visual_feats = self.visual_fc(visual_feats[:, 1024:])
             else:
